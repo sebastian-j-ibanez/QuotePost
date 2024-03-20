@@ -17,7 +17,10 @@ namespace ProblemAnalysis3.DataAccess
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Establish many to many relationship between Quote/Tag and QuoteTag objects.
-            
+
+            // Define QuoteTag composite PK.
+            modelBuilder.Entity<QuoteTag>().HasKey(qt => new { qt.QuoteId, qt.TagId });
+
             // One Quote to many QuoteTags.
             modelBuilder.Entity<QuoteTag>()
                 .HasOne(qt => qt.Quote)

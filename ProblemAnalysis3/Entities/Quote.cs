@@ -11,6 +11,6 @@ namespace ProblemAnalysis3.Entities
 
         public string? Author { get; set; }
 
-        public List<QuoteTag> QuoteTags { get; set; } = new List<QuoteTag>();
+        public List<QuoteTag> QuoteTags { get; set; }
     }
 }
