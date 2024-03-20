@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using ProblemAnalysis3.DataAccess;
 
-namespace ProblemAnalysis3
+namespace WebApplication1
 {
     public class Program
     {
@@ -7,28 +9,14 @@ namespace ProblemAnalysis3
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            var connStr = builder.Configuration.GetConnectionString("PA3Db");
+            builder.Services.AddDbContext<QuoteDbContext>(options => options.UseSqlServer(connStr));
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
+            app.MapGet("/", () => "Hello World!");
 
             app.Run();
         }
