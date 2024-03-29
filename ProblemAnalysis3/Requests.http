@@ -1,0 +1,22 @@
+﻿GET https://localhost:7154/api/quotes
+Accept: application/json
+
+###
+
+GET https://localhost:7154/api/quotes/1
+Accept: application/json
+
+###
+
+GET https://localhost:7154/api/quotes/tag/1
+Accept: application/json
+
+###
+
+POST https://localhost:7154/api/quotes
+Content-Type: application/json
+
+{
+    "Content": "This is a quote by me.",
+    "Author": "Sebastian"
+}

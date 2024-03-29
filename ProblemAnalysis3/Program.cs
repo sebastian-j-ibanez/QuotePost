@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProblemAnalysis3.DataAccess;
 
-namespace WebApplication1
+namespace ProblemAnalysis3
 {
     public class Program
     {
@@ -12,11 +12,16 @@ namespace WebApplication1
             var connStr = builder.Configuration.GetConnectionString("PA3Db");
             builder.Services.AddDbContext<QuoteDbContext>(options => options.UseSqlServer(connStr));
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(config =>
+            {
+                config.RespectBrowserAcceptHeader = true;
+                config.ReturnHttpNotAcceptable = true;
+            });
 
             var app = builder.Build();
 
-            app.MapGet("/", () => "Hello World!");
+            app.UseHttpsRedirection();
+            app.MapControllers();
 
             app.Run();
         }
