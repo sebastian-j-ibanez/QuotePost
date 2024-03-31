@@ -78,37 +78,43 @@ namespace ProblemAnalysis3.Controllers
         {
             // Find a quote from the database that matches the route's quoteId.
             var quote = _quoteDbContext.Quotes
-                .Where(q => q.QuoteId == quoteId)
-                .FirstOrDefault();
+                .FirstOrDefault(q => q.QuoteId == quoteId);
 
             // Manually set all quote tags associated with the found quote,
             // EXCEPT for the quote to avoid circular reference.
-            quote.QuoteTags = _quoteDbContext.QuoteTags
-                .Where(qt => qt.QuoteId == quote.QuoteId)
-                .Select(qt => new QuoteTag()
-                {
-                    QuoteId = quote.QuoteId, 
-                    TagId = qt.TagId,
-                    Tag = qt.Tag
-                })
-                .ToList();
-                
+            if (quote != null)
+            {
+                quote.QuoteTags = _quoteDbContext.QuoteTags
+                    .Where(qt => qt.QuoteId == quote.QuoteId)
+                    .Select(qt => new QuoteTag()
+                    {
+                        QuoteId = quote.QuoteId,
+                        TagId = qt.TagId,
+                        Tag = qt.Tag
+                    })
+                    .ToList();
 
-            return Ok(quote);
+
+                return Ok(quote);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         // Add a quote.
         [HttpPost("/api/quotes")]
-        public IActionResult AddQuote([FromBody()]AddQuoteRequest addQuoteRequest)
+        public IActionResult AddQuote([FromBody()] QuoteContentResource quoteContentResource)
         {
-            Quote newQuote = new Quote()
+            // Add quote to Db using info found in body.
+            var result= _quoteDbContext.Quotes.Add(new Quote()
             {
-                Content = addQuoteRequest.Content,
-                Author = addQuoteRequest.Author,
+                Content = quoteContentResource.Content,
+                Author = quoteContentResource.Author,
                 QuoteTags = new List<QuoteTag>(),
-            };
+            });
             
-            var result= _quoteDbContext.Quotes.Add(newQuote);
             _quoteDbContext.SaveChanges();
             
             return CreatedAtAction("GetQuoteById", new { id = result.Entity.QuoteId }, result.Entity);
@@ -116,14 +122,119 @@ namespace ProblemAnalysis3.Controllers
 
         // Update a quote.
         [HttpPost("/api/quotes/{quoteId}")]
-        public IActionResult EditQuote([FromBody()] UpdateQuoteRequest updateQuoteRequest)
+        public IActionResult EditQuote(int quoteId, [FromBody()] QuoteContentResource quoteContentResource)
         {
+            // Find quote with matching Id.
+            Quote? quote = _quoteDbContext.Quotes.Find(quoteId);
+            
+            if (quote == null)
+            {
+                return NotFound();
+            }
+            
+            // Update the quote fields.
+            quote.Content = quoteContentResource.Content;
+            quote.Author = quoteContentResource.Author;
+            
+            // Update quote and save changes.
+            _quoteDbContext.Update(quote);
+            _quoteDbContext.SaveChanges();
 
             return Ok();
         }
 
         // Add a tag to a quote.
+        [HttpPost("/api/quotes/{quoteId}/tag/{tagId}")]
+        public IActionResult AddTagToQuote(int quoteId, int tagId)
+        {
+            // Find quote with matching Id.
+            var quote = _quoteDbContext.Quotes
+                .Include(q => q.QuoteTags)
+                .FirstOrDefault(q => q.QuoteId == quoteId);
+
+            // Find tag by id.
+            var tag = _quoteDbContext.Tags.Find(tagId);
+
+            // Return error if either quote or tag are null.
+            if (quote == null || tag == null)
+            {
+                return NotFound();
+            }
+            
+            // Construct quoteTag.
+            QuoteTag quoteTag = new QuoteTag()
+            {
+                QuoteId = quoteId,
+                TagId = tagId,
+            };
+            
+            // Initialize list if has not been already.
+            // Add quoteTag to quote.
+            quote.QuoteTags.Add(quoteTag);
+            
+            // Update quote in database.
+            _quoteDbContext.Update(quote);
+            _quoteDbContext.SaveChanges();
+            
+            return Ok();
+        }
+        
+        // Add a like to a post.
+        [HttpPost("/api/quotes/{quoteId}/like")]
+        public IActionResult IncreaseQuoteLikeCount (int quoteId)
+        {
+            // Get quote from DbContext.
+            var quote = _quoteDbContext.Quotes.Find(quoteId);
+            
+            if (quote == null)
+            {
+                return NotFound();
+            }
+
+            // Increment like count, update quote, save DbContext.
+            quote.LikeCount++;
+            _quoteDbContext.Update(quote);
+            _quoteDbContext.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPut("/api/quotes/{quoteId}/like")]
+        public IActionResult ResetLikeCount(int quoteId)
+        {
+            // Get quote from DbContext.
+            var quote = _quoteDbContext.Quotes.Find(quoteId);
+
+            if (quote == null)
+            {
+                return NotFound();
+            }
+
+            // Reset like count, update Db, and save changes.
+            quote.LikeCount = 0;
+            _quoteDbContext.Update(quote);
+            _quoteDbContext.SaveChanges();
+
+            return Ok();
+        }
 
         // Delete a quote by Id.
+        [HttpDelete("/api/quotes/{quoteId}")]
+        public IActionResult DeleteQuoteById(int quoteId)
+        {
+            // Remove Http
+            Quote? quote = _quoteDbContext.Quotes.Find(quoteId);
+
+            if (quote == null)
+            {
+                return NotFound();
+            }
+
+            // Remove quote from DbContext.
+            _quoteDbContext.Remove(quote);
+            _quoteDbContext.SaveChanges();
+            
+            return Ok();
+        }
     }
 }

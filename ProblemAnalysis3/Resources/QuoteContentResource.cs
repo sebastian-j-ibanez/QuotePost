@@ -1,6 +1,6 @@
 ﻿namespace ProblemAnalysis3.Models;
 
-public class AddQuoteRequest
+public class QuoteContentResource
 {
     public string Content { get; set; }
     

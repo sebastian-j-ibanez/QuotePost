@@ -17,11 +17,20 @@ namespace ProblemAnalysis3
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
             });
+            
+            // Add CORS support:
+            builder.Services.AddCors(options => {
+                options.AddPolicy("AllowQuoteClients", policy => {
+                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
 
             var app = builder.Build();
 
             app.UseHttpsRedirection();
             app.MapControllers();
+
+            app.UseCors("AllowQuoteClients");
 
             app.Run();
         }

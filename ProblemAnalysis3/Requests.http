@@ -1,18 +1,21 @@
-﻿GET https://localhost:7154/api/quotes
+﻿### 
+// Get all quotes.
+GET https://localhost:7154/api/quotes
 Accept: application/json
 
 ###
+// Get quote by id.
 
 GET https://localhost:7154/api/quotes/1
 Accept: application/json
 
 ###
-
-GET https://localhost:7154/api/quotes/tag/1
+// Get quotes based on tag.
+GET https://localhost:7154/api/quotes/tag/2
 Accept: application/json
 
 ###
-
+// Add a quote.
 POST https://localhost:7154/api/quotes
 Content-Type: application/json
 
@@ -20,3 +23,32 @@ Content-Type: application/json
     "Content": "This is a quote by me.",
     "Author": "Sebastian"
 }
+
+###
+// Update a quote.
+POST https://localhost:7154/api/quotes/8
+Content-Type: application/json
+
+{
+  "Content": "This is an updated quote by someone else.",
+  "Author": "Not Sebastian"
+}
+
+###
+// Add a tag to a quote.
+POST https://localhost:7154/api/quotes/8/tag/1
+
+###
+// Increase the like count.
+POST https://localhost:7154/api/quotes/1/like
+
+###
+//Reset like count.
+PUT https://localhost:7154/api/quotes/1/like
+
+###
+
+// Delete quote.
+DELETE https://localhost:7154/api/quotes/9
+
+###
