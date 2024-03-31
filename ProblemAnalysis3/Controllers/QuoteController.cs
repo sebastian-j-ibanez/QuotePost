@@ -71,6 +71,18 @@ namespace ProblemAnalysis3.Controllers
 
             return Ok(quotes);
         }
+        
+        // Get all tags.
+        [HttpGet("/api/quotes/tags")]
+        public IActionResult GetAllTags()
+        {
+            // Get all tags from DbContext.
+            var tags = _quoteDbContext.Tags
+                .OrderBy(t => t.TagId)
+                .ToList();
+            
+            return Ok(tags);
+        }
 
         // Find a quote by Id.
         [HttpGet("/api/quotes/{quoteId}")]
@@ -103,6 +115,23 @@ namespace ProblemAnalysis3.Controllers
             }
         }
 
+        // Get a random quote.
+        [HttpGet("/api/quotes/random")] 
+        public IActionResult GetRandomQuote()
+        {
+            // Select all quotes from DbContext.
+            var quotes = _quoteDbContext.Quotes
+                .OrderBy(q => q.QuoteId)
+                .ToList();
+            
+            // Get quote at random index in list.
+            var random = new Random();
+            int randomIndex = random.Next(quotes.Count());
+            Quote quote = quotes[randomIndex];
+            
+            return Ok(quote);
+        }
+
         // Add a quote.
         [HttpPost("/api/quotes")]
         public IActionResult AddQuote([FromBody()] QuoteContentResource quoteContentResource)
@@ -117,7 +146,7 @@ namespace ProblemAnalysis3.Controllers
             
             _quoteDbContext.SaveChanges();
             
-            return CreatedAtAction("GetQuoteById", new { id = result.Entity.QuoteId }, result.Entity);
+            return CreatedAtAction("AddQuote", new { id = result.Entity.QuoteId }, result.Entity);
         }
 
         // Update a quote.

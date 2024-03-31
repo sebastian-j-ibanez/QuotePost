@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProblemAnalysis3", "ProblemAnalysis3\ProblemAnalysis3.csproj", "{CF36763A-053A-44B5-A229-752A0A31F47E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPAClient", "SPAClient\SPAClient.csproj", "{8C07D9AC-0AF9-4BFF-AD51-B1D6467F765D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{CF36763A-053A-44B5-A229-752A0A31F47E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF36763A-053A-44B5-A229-752A0A31F47E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF36763A-053A-44B5-A229-752A0A31F47E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C07D9AC-0AF9-4BFF-AD51-B1D6467F765D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C07D9AC-0AF9-4BFF-AD51-B1D6467F765D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C07D9AC-0AF9-4BFF-AD51-B1D6467F765D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C07D9AC-0AF9-4BFF-AD51-B1D6467F765D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
