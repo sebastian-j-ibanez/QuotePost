@@ -150,7 +150,7 @@ namespace ProblemAnalysis3.Controllers
         }
 
         // Update a quote.
-        [HttpPost("/api/quotes/{quoteId}")]
+        [HttpPatch("/api/quotes/{quoteId}")]
         public IActionResult EditQuote(int quoteId, [FromBody()] QuoteContentResource quoteContentResource)
         {
             // Find quote with matching Id.
@@ -208,7 +208,7 @@ namespace ProblemAnalysis3.Controllers
             return Ok();
         }
         
-        // Add a like to a post.
+        // Increase the a quotes like count.
         [HttpPost("/api/quotes/{quoteId}/like")]
         public IActionResult IncreaseQuoteLikeCount (int quoteId)
         {
@@ -228,6 +228,27 @@ namespace ProblemAnalysis3.Controllers
             return Ok();
         }
 
+        // Decrease a quotes list count.
+        [HttpPost("/api/quotes/{quoteId}/dislike")]
+        public IActionResult DecreaseQuoteLikeCount(int quoteId)
+        {
+            // Get quote from DbContext.
+            var quote = _quoteDbContext.Quotes.Find(quoteId);
+            
+            if (quote == null)
+            {
+                return NotFound();
+            }
+
+            // Increment like count, update quote, save DbContext.
+            quote.LikeCount--;
+            _quoteDbContext.Update(quote);
+            _quoteDbContext.SaveChanges();
+
+            return Ok();
+        }
+
+        // Set like count to 0.
         [HttpPut("/api/quotes/{quoteId}/like")]
         public IActionResult ResetLikeCount(int quoteId)
         {

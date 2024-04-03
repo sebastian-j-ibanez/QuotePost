@@ -1,5 +1,44 @@
 ﻿@{
-    ViewData["Title"] = "C";
+    ViewData["Title"] = "SPA Quote Client";
 }
 
-@**@
+@*Table to display all quotes*@
+<div class="container-fluid h-100">
+    <a class="btn btn-primary my-3" type="button" data-bs-toggle="collapse" data-bs-target="#formContainer" aria-expanded="false" aria-controls="formContainer">Toggle Quote Form</a>
+    <div class="collapse" id="formContainer">
+        <form class="quoteForm mb-3">
+            <div class="form-group">
+                <label for="quoteContent">Quote:</label>
+                <input type="text" class="form-control" id="quoteContent" name="quoteContent" />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="quoteAuthor">Author:</label>
+                <input type="text" class="form-control" id="quoteAuthor" name="quoteName" />
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="quoteTag">Tag:</label>
+                <input type="text" class="form-control" id="quoteTag" name="quoteTag" list="tagList" />
+                <datalist id="tagList"></datalist>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-12 col-sm-12">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th class="col-md-6">Quote</th>
+                <th>Author</th>
+                <th>Tags</th>
+                <th>Likes</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="quoteTableRows">
+
+            </tbody>
+        </table>
+    </div>
+</div>
