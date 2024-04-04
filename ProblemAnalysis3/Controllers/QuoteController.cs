@@ -171,6 +171,21 @@ namespace ProblemAnalysis3.Controllers
 
             return Ok();
         }
+        
+        // Add a tag.
+        [HttpPost("/api/quotes/tag")]
+        public IActionResult AddTag([FromBody()] TagContentResource tagContentResource)
+        {
+            var result = _quoteDbContext.Tags.Add(new Tag()
+            {
+                TagName = tagContentResource.TagName,
+                QuoteTags = new List<QuoteTag>(),
+            });
+
+            _quoteDbContext.SaveChanges();
+
+            return CreatedAtAction("AddTag", new { id = result.Entity.TagId }, result.Entity);
+        }
 
         // Add a tag to a quote.
         [HttpPost("/api/quotes/{quoteId}/tag/{tagId}")]
@@ -208,7 +223,7 @@ namespace ProblemAnalysis3.Controllers
             return Ok();
         }
         
-        // Increase the a quotes like count.
+        // Increase a quotes like count.
         [HttpPost("/api/quotes/{quoteId}/like")]
         public IActionResult IncreaseQuoteLikeCount (int quoteId)
         {
@@ -284,6 +299,24 @@ namespace ProblemAnalysis3.Controllers
             _quoteDbContext.Remove(quote);
             _quoteDbContext.SaveChanges();
             
+            return Ok();
+        }
+        
+        // Delete tag by Id.
+        [HttpDelete("/api/quotes/tag/{tagId}")]
+        public IActionResult DeleteTagById(int tagId)
+        {
+            Tag? tag = _quoteDbContext.Tags.Find(tagId);
+
+            if (tag == null)
+            {
+                return NotFound();
+            }
+            
+            // Remove tag from DbContext.
+            _quoteDbContext.Tags.Remove(tag);
+            _quoteDbContext.SaveChanges();
+
             return Ok();
         }
     }

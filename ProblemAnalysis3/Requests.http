@@ -36,17 +36,26 @@ Content-Type: application/json
 
 ###
 // Update a quote.
-POST http://localhost:5080/api/quotes/8
+PATCH http://localhost:5080/api/quotes/8
 Content-Type: application/json
 
 {
   "Content": "This is an updated quote by someone else.",
-  "Author": "Not Sebastian"
+  "Author": "bruh"
+}
+
+###
+// Add a tag.
+POST http://localhost:5080/api/quotes/tag
+Content-Type: application/json
+
+{
+  "tagName": "Inspirational"
 }
 
 ###
 // Add a tag to a quote.
-POST http://localhost:5080/api/quotes/8/tag/1
+POST http://localhost:5080/api/quotes/16/tag/1
 
 ###
 // Increase the like count.
@@ -57,8 +66,11 @@ POST http://localhost:5080/api/quotes/1/like
 PUT http://localhost:5080/api/quotes/1/like
 
 ###
-
 // Delete quote.
 DELETE http://localhost:5080/api/quotes/14
+
+###
+//Delete tag.
+DELETE http://localhost:5080/api/quotes/tag/6
 
 ###

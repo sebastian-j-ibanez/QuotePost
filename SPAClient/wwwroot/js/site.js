@@ -1,4 +1,23 @@
-﻿let _quoteTableRows = $('#quoteTableRows');
+﻿// Form table rows.
+let _quoteTableRows = $('#quoteTableRows');
+
+// Add/edit quote form elements.
+let _quoteFormTitle = $('#quoteFormTitle');
+let _quoteFormContent = $('#quoteFormContent');
+let _quoteFormAuthor = $('#quoteFormAuthor');
+let _quoteFormTags = $('#quoteFormTags');
+_quoteFormTags.hide();
+let _quoteFormTagsLabel = $('#quoteFormTagLabel');
+_quoteFormTagsLabel.hide();
+let _quoteTagList = $('#tagList');
+let _quoteFormSubmit = $('#quoteFormSubmit');
+_quoteFormSubmit.bind("click", function() {
+    addQuote();
+}); 
+let _quoteFormReset = $('#quoteFormReset');
+_quoteFormReset.click(function() {
+    resetQuoteForm();
+});
 
 // Load the quote table.
 async function loadQuoteTable() {
@@ -26,7 +45,7 @@ async function loadQuoteTable() {
         let tagCell = $('<td>').addClass('justify-content-center align-items-center align-middle').text('');
         let tags = quote.quoteTags;
         tags.forEach(tag => {
-            let newTag = $('<span>').addClass('badge rounded-pill bg-primary align-middle').text(tag.tag.tagName);
+            let newTag = $('<span>').addClass('badge rounded-pill bg-primary align-middle').text(tag.tag.tagName).data('tagid', tag.tagId);
             tagCell.append(newTag);
         });
         
@@ -35,26 +54,26 @@ async function loadQuoteTable() {
         let likeCount = $('<span>').addClass('badge text-primary justify-content-center align-middle me-2 ms-4').text(quote.likeCount);
         let likeButton = $('<button>').addClass('btn btn-sm justify-content-center align-middle')
             .html('&#x2795;')
-            .click(function() {
+            .bind("click",function() {
             likeQuote(quote.quoteId);
         });
         let dislikeButton = $('<button>').addClass('btn btn-sm justify-content-center align-middle')
             .html('&#x2796;')
-            .click(function() {
+            .bind("click",function() {
             dislikeQuote(quote.quoteId);
         });
         likesCell.append(likeCount, likeButton, dislikeButton);
         
         // Setup 'Actions' column with edit and delete buttons.
         let actionCell = $('<td>').addClass('justify-content-center align-items-center').text('');
-        let editButton = $('<button>').addClass('btn btn-sm btn-primary m-1 align-middlei')
+        let editButton = $('<button>').addClass('btn btn-sm btn-primary m-1 align-middle')
             .text('Edit')
-            .click(function() {
+            .bind("click", function() {
                 showEditForm(quote);
             });
         let deleteButton = $('<button>').addClass('btn btn-sm btn-primary align-middle')
             .text('Delete')
-            .click(function() {
+            .bind("click", function() {
             deleteQuote(quote.quoteId)
         });
         actionCell.append(editButton, deleteButton);
@@ -63,7 +82,7 @@ async function loadQuoteTable() {
         _quoteTableRows.append(row);
     });
     
-    setFormTags();
+    await setFormTags();
 }
 
 // Make 'like' request and reload table.
@@ -86,26 +105,167 @@ async function dislikeQuote(quoteId) {
     await loadQuoteTable();
 }
 
+// Function to reset form when toggle form is clicked
+async function resetQuoteForm() {
+    _quoteFormTitle.text('Add Quote');
+    _quoteFormContent.val('');
+    _quoteFormAuthor.val('');
+    _quoteFormTags.val('');
+    _quoteFormTagsLabel.hide();
+    _quoteFormTags.hide();
+    _quoteFormSubmit.unbind("click");
+    _quoteFormSubmit.bind("click", function () {
+        addQuote();
+    });
+}
+
 // Show edit form filled with quote information.
-// Call editQuote function when submitted.
 async function showEditForm(quote) {
     // Setup form.
+    _quoteFormTitle.text('Edit Quote');
     
+    // Populate form fields with quote information.
+    _quoteFormContent.val(quote.content);
+    _quoteFormAuthor.val(quote.author);
+    let quoteTags = quote.quoteTags;
+    if (quoteTags.length > 0) {
+        _quoteFormTags.val(quoteTags[0].tag.tagName);
+    }
+    
+    // Show tag section.
+    _quoteFormTags.show();
+    _quoteFormTagsLabel.show();
+    
+    // Unbind/bind submission button with editQuote function.
+    _quoteFormSubmit.unbind("click");
+    _quoteFormSubmit.bind("click", await function() {
+        editQuote(quote.quoteId);
+    });
+}
+
+// Add a new quote.
+async function addQuote() {
+    if (_quoteFormContent.val().trim() === '') {
+        alert("Quote field is empty!");
+    }
+    else {
+        let quote = {
+            'content': _quoteFormContent.val(),
+            'author': _quoteFormAuthor.val(),
+        };
+
+        console.log();
+        console.log(quote);
+        let quoteBody = JSON.stringify(quote);
+        let quoteId = -1;
+        console.log(quoteBody);
+        fetch('http://localhost:5080/api/quotes', {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: quoteBody
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log(response);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
 }
 
 // PATCH a quote based on quoteId.
 async function editQuote(quoteId) {
-    let resp = await fetch(`http://localhost:5080/api/quotes/${quoteId}`, {
+    console.log(quoteId);
+    // Get quote from form fields.
+    let quote = {
+        "Content": _quoteFormContent.val(),
+        "Author": _quoteFormAuthor.val()
+    };
+
+    // PATCH quote at ID.
+    fetch(`http://localhost:5080/api/quotes/${quoteId}`, {
         method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(quote),
+    })
+        .then(response => {
+            console.log(response);
+            if (response.ok) {
+                loadQuoteTable();
+            }
+        })
+        .catch(error => {
+            console.log("Error PATCH quote:", error);
+        });
+
+    if (_quoteFormTags.val()) {
+        getTagId()
+            .then(tagId => {
+                fetch(`http://localhost:5080/api/quotes/${quoteId}/tag/${tagId}`, {
+                    method: 'POST',
+                }).then(response => {
+                    console.log(response);
+                }).catch(error => {
+                    console.log("Error POST quote and tag:", error);
+                });
+            })
+            .catch(error => {
+                console.log("Error getting tag Id", error);
+            });
+    }
+}
+
+// Get tagId from _quoteFromTags
+async function getTagId() {
+    // Check if tag input is an existing tag.
+    let resp = await fetch('http://localhost:5080/api/quotes/tags', {
+        method: 'GET',
         mode: 'cors',
     });
+
+    let tagInput = _quoteFormTags.val();
+    tagInput = tagInput.toString();
+    let tags = await resp.json();
     
-    // If response code is 201:
-    // Reset form.
-    // Load quote table.
-    if (resp.status === 201) {
-        await loadQuoteTable();
+    let tagId = -1;
+    tags.forEach(tag => {
+        // console.log(tag);
+        // alert(tag);
+        if (tag.tagName == tagInput) {
+            tagId = tag.tagId;
+        }
+    });
+    
+    if (tagId == -1) {
+        let tagBody = {
+            'tagName': tagInput
+        };
+
+        // Create tag if it does not exist.
+        fetch('http://localhost:5080/api/quotes/tag', {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(tagBody),
+        }).then(response => {
+            let newTagJSON = response.json();
+            tagId = newTagJSON.tagId;
+        }).catch(error => {
+            alert(error);
+            tagId = -1;
+        });
     }
+    
+    return tagId;
 }
 
 // DELETE a quote based on quoteId.
@@ -115,22 +275,23 @@ async function deleteQuote(quoteId) {
         mode: 'cors',
     });
     
-    await loadQuoteTable();
+    loadQuoteTable();
 }
 
 // Get all tags, append them to form datalist.
 async function setFormTags() {
-    let _tagList = $('#tagList');
-    
     let resp = await fetch(`http://localhost:5080/api/quotes/tags`, {
         method: 'GET',
         mode: 'cors',
     });
     
-    let tags = resp.json();
+    _quoteTagList.empty();
+    
+    let tags = await resp.json();
     tags.forEach(tag => {
-        let newTagOption = $('<option>').value(tag.tagName);
-        _tagList.append(newTagOption);
+        console.log(tag);
+        let newTagOption = $('<option>').val(tag.tagName).data('tagid', tag.tagId);
+        _quoteTagList.append(newTagOption);
     });
 }
 
