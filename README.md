@@ -1,5 +1,6 @@
 # QuotePost 📜
-
+![Static Badge](https://img.shields.io/badge/.NET-8.0.300-purple?style=flat&logo=csharp&logoColor=white)
+![Static Badge](https://img.shields.io/badge/Python-3.11.8-blue?style=flat&logo=python&logoColor=white)
 ## What is it?
 QuotePost is a platform for posting quotes. It allows for creating, deleting, and liking quotes.
 
