@@ -132,6 +132,16 @@ namespace ProblemAnalysis3.Controllers
             return Ok(quote);
         }
 
+        [HttpGet("/api/quotes/mostliked")]
+        public IActionResult GetMostLike()
+        {
+            var quote = _quoteDbContext.Quotes
+                .OrderByDescending(q => q.LikeCount)
+                .FirstOrDefault();
+
+            return Ok(quote);
+        }
+
         // Add a quote.
         [HttpPost("/api/quotes")]
         public IActionResult AddQuote([FromBody()] QuoteContentResource quoteContentResource)

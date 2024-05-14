@@ -25,6 +25,10 @@ GET http://localhost:5080/api/quotes/random
 Accept: application/json
 
 ###
+// Get most liked quote.
+GET http://localhost:5080/api/quotes/mostliked
+
+###
 // Add a quote.
 POST http://localhost:5080/api/quotes
 Content-Type: application/json
