@@ -10,7 +10,7 @@ The QuotePost API backend was written in C# with ASP.NET Core. The API stores qu
 ## Screenshots
 ### ASP.NET SPA Client
 ![SPAList](img/SPA-client-list-quotes.png "SPA List")
-![SPAForm](img/SPA-client-list-quotes.png "SPA Form")
+![SPAForm](img/SPA-client-quote-form.png "SPA Form")
 ### Python CLI Client
 ![PythonMenu](img/Py-client-main-menu.png "Python Main Menu")
 ![PythonList](img/Py-client-list-quotes.png "Python List")
